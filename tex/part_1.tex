@@ -1,0 +1,311 @@
+\documentclass[a4paper]{article}
+
+\usepackage{sds-math}
+\usepackage{newcomputermodern}
+\usepackage{hyperref}
+\usepackage[landscape,twocolumn,margin=1.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\setenumerate{noitemsep}
+\setitemize{noitemsep}
+\pagenumbering{gobble}
+
+\title{Part I Exam Cheatsheets:\\Probability and Statistics Theory}
+\author{Eric Ordo\~nez}
+\date{April 2025}
+
+\begin{document}
+\maketitle
+
+\section{Common distributions}
+    {
+    \renewcommand*{\arraystretch}{2.25}
+    \[ \begin{array}{*4{>{\displaystyle}l}}
+        \textbf{Distribution} & \textbf{Mean}       & \textbf{Variance}               & \textbf{PMF/PDF} \\ \hline
+        \unifdist{a}{b}     & \frac{a + b}{2}   & \frac{(b - a)(b - a + 2)}{12} & \frac{1}{b - a + 1} \\
+        \berdist{p}         & p                 & p(1 - p)                      & p^x (1 - p)^{1 - x} \\
+        \bindist{n}{p}      & np                & np(1 - p)                     & \binom{n}{k} p^k (1 - p)^{n - k} \\
+        \geomdist{p}        & \frac{1}{p}       & \frac{1 - p}{p^2}             & p(1 - p)^{k - 1} \\
+        \poissdist{\lambda}     & \lambda           & \lambda                   & \frac{\lambda^k e^{-\lambda}}{k!} \\
+        \unifdist{a}{b}         & \frac{a + b}{2}   & \frac{(b - a)^2}{12}      & \frac{1}{b - a} \\
+        \ndist{\mu}{\sigma^2}   & \mu               & \sigma^2                  & \frac{1}{\sqrt{2 \pi \sigma^2}} \exp{\left(-\frac{(x - \mu)^2}{2 \sigma^2}\right)} \\
+        \expdist{\lambda}       & \frac{1}{\lambda} & \frac{1}{\lambda^2}       & \lambda e^{-\lambda x} \\
+        \betadist{\alpha}{\beta}    & \frac{\alpha}{\alpha + \beta} & \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}  & \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} x^{\alpha - 1} (1 - x)^{\beta - 1} \\
+        \gammadist{\alpha}{\beta}   & \frac{\alpha}{\beta}          & \frac{\alpha}{\beta^2}                                        & \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha - 1} e^{-\beta x}
+    \end{array} \]    
+    }
+
+\section{Conditioning, independence, and counting}
+    \subsection{Conditional probability}
+        \textbf{Multiplication rule:} Given a countable set of events $\set{A_i}$,
+        \[
+            \Pr{\left(\bigcap_{i=1}^n A_i\right)} = \Pr{(A_1)} \Pr{(A_2 \,|\, A_1)} \Pr{(A_3 \,|\, A_1 \cap A_2)} \cdots \Pr{\left(A_n \,\middle|\, \bigcap_{i=1}^{n-1} A_i\right)}
+        \]
+
+        \textbf{Law of total probability:} Given a mutually exclusive, collectively exhaustive, and countable set of events $\set{A_i}$, $\Pr{(B)} = \sum_i \Pr{(A_i)} \Pr{(B \,|\, A_i)}$.
+
+    \subsection{Independence}
+        A countable set of events $\set{A_i}$ is independent if $\Pr{\left(\bigcap_{i \in S} A_i\right)} = \prod_{i \in S} \Pr{(A_i)}$ for every subsets $S$ of the enumeration of $\set{A_i}$.
+
+        Some facts about independence:
+        \begin{itemize}
+            \item $A$ and $B$ are independent iff $\Pr{(A \,|\, B)} = \Pr{(A)}$.
+            \item If $A$ and $B$ are independent, so are $A$ and $B^c$ (and so are $A^c$ and $B^c$).
+            \item Independence implies pairwise independence, but not vice versa.
+            \item Independence does not imply conditional independence, and vice versa.
+            \item If $X$ and $Y$ are independent r.v.s, then $\E{[g(X) h(Y)]} = \E{[g(X)]} \E{[h(Y)]}$ for any functions $g, h$, and $\Var{(X + Y)} = \Var{X} + \Var{Y}$.
+        \end{itemize}
+
+    \subsection{Counting}
+        Number of\dots
+        \begin{itemize}
+            \item Permutations of $n$ objects: $n!$
+            \item $k$-permutations of $n$ objects: $n! / (n - k)!$
+            \item Combinations of $k$ out of $n$ objects: $n! / (k! (n - k)!)$
+            \item Partitions of $n$ objects into $r$ groups with the $i$-th group having $n_i$ objects: $n! / (n_1! n_2! \cdots n_r!)$
+        \end{itemize}
+
+\section{Random variables}
+    \subsection{Properties of expectation and variance}
+        \textbf{Law of iterated expectations:} $\E{[\E{[X \,|\, Y]}]} = \E{[X]}$
+
+        \textbf{Law of total expectation:} $\E{[X]} = \int_Y \E{[X \,|\, Y = y]} f_Y(y) \difl y$
+
+        \textbf{Law of total variance:} $\Var{X} = \E{[\Var{(X \,|\, Y)}]} + \Var{\E{[X \,|\, Y]}}$
+        
+    \subsection{Derived distributions}
+        How to find the distribution of a function $Y = g(X)$ of a continuous r.v.\ $X$ with known distribution $f_X$:
+        \[
+            f_Y(y) = \diff{F_Y(y)}{y} = \diff*{\Pr{[g(X) \leq y]}}{y}  = \diff*{\int_{\set[x]{g(x) \leq y}} f_X(x) \difl x}{y}
+        \]
+        Two important cases:
+        \begin{itemize}
+            \item A linear transformation $Y = aX + b$:
+            \[
+                f_Y(y) = \frac{1}{\abs{a}} f_X\left(\frac{y - b}{a}\right)
+            \]
+            \item A monotonic transformation $Y = g(X)$, where $h(y) = g^{-1}(y)$:
+            \[
+                f_Y(y) = f_X\left(h(y)\right) \abs{\diff{h(y)}{y}}
+            \]
+        \end{itemize}
+    
+    \subsection{Sum of independent random variables}
+        The PDF of the sum of two independent r.v.s is the \emph{convolution} of their PDFs.
+        If $Z = X + Y$, then $f_Z(z) = \int_{\R} f_X(x) f_Y(z - x) \difl x$.
+        
+        One application of this is that the sum of finitely many independent normal variables is normal: $\sum_{i=1}^{n} \ndist{\mu_i}{\sigma_i^2} \sim \ndist{\sum_{i=1}^{n} \mu_i}{\sum_{i=1}^{n} \sigma_i^2}$.
+
+    \subsection{Correlation and covariance}
+        The \emph{correlation coefficient} measures the linear association between variables:
+        \[
+            \rho_{XY} = \frac{1}{n} \sum_{i=1}^{n} \left(\frac{X_i - \mean{X}_n}{\sigma_X}\right) \left(\frac{Y_i - \mean{Y}_n}{\sigma_Y}\right) = \frac{\Cov{(X, Y)}}{\sigma_X \sigma_Y} \in [-1, 1]
+        \]
+        Properties of covariance:
+        \begin{itemize}
+            \item $\Cov{(aX + b, Y)} = a \Cov{(X, Y)}$
+            \item $\Cov{(X, Y + Z)} = \Cov{(X, Y)} + \Cov{(Y, Z)}$
+            \item $\Var{\left(\sum_{i=1}^{n} X_i\right)} = \sum_{i=1}^{n} \Var{X_i} + \sum_{\set[(i, j)]{i \neq j}} \Cov{(X_i, X_j)}$
+        \end{itemize}
+
+\section{Stochastic processes}
+    Start with a sequence of independent geometric (exponential) random variables $(T_n)$ with common parameter $p$ ($\lambda$).
+    (Let these be the interarrival times).
+    Then the sequence $(Y_n)$ of arrival times is a Bernoulli (Poisson) process defined $Y_k = \sum_{i=1}^{k} T_i$.
+    
+    If Bernoulli, the PMF of $Y_k$ is the Pascal PMF of order $k$:
+    \[
+        p_{Y_k}(t) = \binom{t - 1}{k - 1} p^k (1 - p)^{t - k} \qquad t = k, k + 1, \dots
+    \]
+    If Poisson, the PDF of $Y_k$ is the Erlang PDF of order $k$:
+    \[
+        f_{Y_k}(y) = \frac{\lambda^k y^{k - 1} e^{-\lambda y}}{(k - 1)!}
+    \]
+
+    For a Bernoulli process with parameter $p$ over $n$ steps, the number of arrivals is $S \sim \bindist{n}{p}$.
+    For a Poisson process with rate $\lambda$ over an interval of length $\tau$, the number of arrivals is $N_\tau \sim \poissdist{\lambda \tau}$.
+
+    Splitting a Bernoulli (Poisson) process with parameter $p$ ($\lambda$):
+    \begin{enumerate}
+        \item Keep with probability $q$ and get a Bernoulli process with parameter $pq$.
+        \item Keep with probability $p$ and get a Poisson process with rate $\lambda p$.
+    \end{enumerate}
+    Merging two independent Bernoulli (Poisson) processes with parameters $p$ and $q$ ($\lambda_1$ and $\lambda_2$), respectively:
+    \begin{enumerate}
+        \item Get a Bernoulli process with parameter $1 - (1 - p)(1 - q) = p + q - pq$. 
+        \item Get a Poisson process with rate $\lambda^\ast = \lambda_1 + \lambda_2$, with arrival probabilities $\lambda_1 / \lambda^\ast$ and $\lambda_2 / \lambda^\ast$ of originating from the first and second process, respectively.
+    \end{enumerate}
+
+\section{Convergence and limit theorems}
+    \subsection{Useful inequalities}
+        \textbf{Markov:} For $X \geq 0$ with $\E{[X]} > 0$ and $t > 0$, $\Pr{[X \geq t]} \leq \E{[X]} / t$.
+
+        \textbf{Chebyshev:} For $X$ with $\E{[X]} < \infty$ and $t > 0$, $\Pr{[\abs{X - \E{[X]}} \geq t]} \leq (\Var{X}) / t^2$.
+
+        \textbf{Hoeffding:} Given $X_{i \in \range{n}} \iid X$ that are a.s.\ bounded, i.e., there exist $a < b$ such that $\Pr{[X_i \notin [a, b]]} = 0$, then $\Pr{\left[\abs{\mean{X}_n - \E{[X]}} \geq \epsilon\right]} \leq 2 \exp{\left(-\frac{2 n \epsilon^2}{(b - a)^2}\right)}$ for all $\epsilon > 0$.
+
+    \subsection{Modes of convergence}
+        Let $(T_n)$ be a sequence of r.v.s and $T$ another r.v., all in $\R$.
+        \begin{enumerate}
+            \item \emph{Convergence almost surely:} $T_n \convas T \iff \Pr{\left[\set[\omega]{T_n(\omega) \rightarrow T(\omega)}\right]} = 1$
+            \item \emph{Convergence in probability:} $T_n \convp T \iff \Pr{[\abs{T_n - T} \geq \epsilon]} \rightarrow 0$ for all $\epsilon > 0$
+            \item \emph{Convergence in distribution:} $T_n \convd T \iff \E{[f(T_n)]} \rightarrow \E{[f(T)]}$ for all continuous and bounded $f$
+        \end{enumerate}
+        (1) implies (2) implies (3), but (3) implies (2) only if the limit $T$ has a density: $T_n \convd T \implies \Pr{[a \leq T_n \leq b]} \rightarrow \Pr{[a \leq T \leq b]}$.
+
+        \textbf{Continuous mapping theorem:} Continuous functions preserve limits.
+
+    \subsection{Limit theorems}
+        Let $X_{i \in \range{n}} \iid X$ with finite mean $\mu$ and sample mean $\mean{X}_n$.
+        \begin{itemize}
+            \item \textbf{Strong LLN:} $\mean{X}_n \convas \mu$, i.e., $\Pr{\left[\lim_{n \rightarrow \infty} \mean{X}_n = \mu \right]} = 1$.
+            \item \textbf{Weak LLN:} If $\Var{X} < \infty$, then $\mean{X}_n \convp \mu$, i.e., $\Pr{[\abs{\mean{X}_n - \mu} \geq \epsilon]} \rightarrow 0$ for all $\epsilon > 0$.
+        \end{itemize}
+
+        \textbf{Central limit theorem:} If, in addition, $\Var{X} = \sigma^2 < \infty$, then the sample mean is asymptotically normal, i.e., $\sqrt{n} (\mean{X}_n - \mu) \convd \ndist{0}{\sigma^2}$.
+
+        \textbf{Slutsky's theorem: } Let $(T_n)$ and $(U_n)$ be sequences of r.v.s such that $T_n \convd T$ and $U_n \convp u \in \R$.
+        Then
+        \begin{itemize}
+            \item $T_n + U_n \convd T + u$
+            \item $T_n U_n \convd Tu$
+            \item $\frac{T_n}{U_n} \convd \frac{T}{u}$ if $u \neq 0$.
+        \end{itemize}
+
+\section{Statistical inference}
+    \subsection{Models and estimation}
+        For a statistical model $\left(E, \set{\Pr_\theta}_{\theta \in \Theta}\right)$:
+        \begin{itemize}
+            \item The model is \emph{parametric} if $\Theta \subseteq \R^m$ and $\Pr_\theta$ is uniquely specified by $\theta$.
+            \item $\theta$ is \emph{identifiable} if the map $\theta \mapsto \Pr_\theta$ is injective.
+        \end{itemize}
+        For an associated i.i.d.\ sample $X_{i \in \range{n}}$ drawn from a distribution $\Pr_\theta$:
+        \begin{itemize}
+            \item A \emph{statistic} is any measurable function of the sample.
+            \item An \emph{estimator} of $\theta$ is a statistic whose expression does not depend on $\theta$.
+            \item An estimator $\hat{\theta}_n$\dots
+            \begin{itemize}
+                \item is \emph{weakly consistent} if $\hat{\theta}_n \convp \theta$.
+                \item is \emph{asymptotically normal} if $\sqrt{n} (\hat{\theta}_n - \theta) \convd \ndist{0}{\sigma^2}$, with \emph{asymptotic variance }$\sigma^2$.
+                \item has \emph{bias} equal to $\E{[\hat{\theta}_n]} - \theta$.
+                \item has \emph{quadratic risk} equal to $\E{[\abs*{\hat{\theta}_n - \theta}^2]} = \text{variance} + \text{bias}^2$.
+            \end{itemize}
+        \end{itemize}
+
+    \subsection{Delta method}
+        Let $(Z_n)$ be a sequence of r.v.s that are asymptotically normal around $\theta$ with variance $\sigma^2$.
+        If the function $g$ is continuously differentiable at $\theta$, then $g(Z_n) \convp g(\theta)$ and $g(Z_n)$ is asymptotically normal around $g(\theta)$ with variance $g'(\theta)^2 \sigma^2$.
+
+\section{Bayesian inference}
+    Recall \textbf{Bayes' theorem:}
+    \[
+        \Pr{(A_i \,|\, B)}
+            = \frac{\Pr{(A_i)} \Pr{(B \,|\, A_i)}}{\sum_j \Pr{(A_j) \Pr{(B \,|\, A_j)}}}
+            = \frac{\Pr{(A)} \Pr{(B \,|\, A)}}{\Pr{(B)}} \quad \text{if only one event } A
+    \]
+
+    Let $\pi(\theta)$ and $\pi(\theta \,|\, X)$ be the prior and posterior distributions, respectively.
+    \begin{itemize}
+        \item \textbf{Bayes estimate:} $\hat{\theta}^{(\pi)} = \int_\Theta \difl \pi(\theta \,|\, X)$
+        \item \textbf{Maximum a posteriori estimate:} $\hat{\theta}^{\textrm{MAP}} = \argmax_{\theta \in \Theta} \pi(\theta \,|\, X)$.
+        \item \textbf{Least mean squares estimate:} $\hat{\theta}^{\textrm{LMS}} = \E{[\Theta \,|\, X = x]}$.
+    \end{itemize}
+    Ways to evaluate a Bayesian estimator (can be unconditional or conditional):
+    \begin{itemize}
+        \item \textbf{Probability of error:} $\Pr{[\hat{\theta} \neq \theta]}$
+        \item \textbf{Mean squared error:} $\E{[(\hat{\theta} - \theta)^2]}$
+    \end{itemize}
+
+    On prior and posterior distributions:
+    \begin{itemize}
+        \item If the PDF of $X$ can be written $f(x) = c e^{-(\alpha x^2 + \beta x + \gamma)}$ with $\alpha > 0$, then $X$ is normal with mean $-\beta / 2\alpha$ and variance $1 / 2\alpha$.
+        \item An \emph{improper prior} is measurable, nonnegative, but not integrable.
+        \item Example: Bernoulli experiment with a beta prior parameterized $(\alpha, \beta)$ has a beta posterior with updated parameters $\left(\alpha + \sum_{i=1}^{n} X_i, \beta + n - \sum_{i=1}^{n} X_i\right)$.
+        \item Jeffreys prior: A \emph{non-informative prior}, i.e., lacking prior information about a parameter, defined $\pi_J(\theta) \propto \sqrt{\det{I(\theta)}}$.
+    \end{itemize}
+
+\section{Hypothesis testing}
+    \subsection{Confidence intervals}
+        The \emph{quantile} of order $1 - \alpha$ of a r.v.\ $X$ is the number $q_\alpha$ such that $\Pr{[X \leq q_\alpha]} = 1 - \alpha$.
+
+        A \emph{confidence interval} of (asymptotic) level $1 - \alpha$ for $\theta$ is any random (dependent upon the random sample) interval $\CI$, whose boundaries do not depend on $\theta$, such that $\left(\lim_{n \rightarrow \infty}\right) \Pr{[\CI \ni \theta]} \geq 1 - \alpha$ for all $\theta \in \Theta$.
+    
+    \subsection{Errors and p-values}
+        The \emph{p-value} is the smallest significance level at which $H_0$ is rejected.
+        \begin{itemize}
+            \item \emph{Type I error:} Reject $H_0$ when $H_0$ is true.
+            \item \emph{Type II error:} Fail to reject $H_0$ when $H_1$ is true.
+            \item \emph{Significance level $\alpha$:} $\Pr{(\text{Type I error})} \leq \alpha$.
+            \item \emph{Power:} $1 - \Pr{(\text{Type II error})}$.
+        \end{itemize}
+
+    \subsection{Wald test vs t-test}
+        \begin{itemize}
+            \item The t-test requires the data to be Gaussian and can only be performed on expected values.
+            \item The Wald test is asymptotic; the t-test can compute non-asymptotic p-values.
+            \item For large sample sizes, the quantiles of the T distribution converge to those of the standard normal distribution.
+            \item In general, the Wald test is more flexible and leads to lower p-values.
+        \end{itemize}
+
+\section{Methods of estimation}
+    \subsection{Maximum likelihood estimation}
+        Minimize an estimate of the KL divergence between an observed distribution and a hypothesized distribution defined by a true parameter $\theta^\ast$:
+        \[
+            \KL{\left(\Pr_\theta, \Pr_{\theta'}\right)} = \int_E f_\theta(x) \log{\left(\frac{f_\theta(x)}{f_{\theta'}(x)}\right)} \difl x
+        \]
+
+        Under some technical conditions, the MLE is a weakly consistent estimator for $\theta^\ast$:
+        \begin{itemize}
+            \item $\theta^\ast$ is identifiable.
+            \item $\theta^\ast$ is in the interior of $\Theta$.
+            \item The support of $\Pr_\theta$ does not depend on $\theta$.
+        \end{itemize}
+
+    \subsection{Fisher information}
+        Define the log-likelihood for one observation as $\ell(\theta) = \log{L(X, \theta)}$ and assume $\ell$ is twice differentiable.
+        Under some regularity conditions, the \emph{Fisher information} is
+        \[
+            I(\theta) = \Var{\ell'(\theta)} = -\E{[\ell''(\theta)]}
+        \]
+        and, if $I(\theta) \neq 0$ in a neighborhood of $\theta^\ast$, then the MLE is asymptotically normal with variance $I(\theta^\ast)^{-1}$.
+
+        Use it to construct the Wald test statistic for the MLE: $W = \sqrt{n I(\hat{\theta}^\textrm{MLE})} (\hat{\theta}^\textrm{MLE} - \theta^\ast)$.
+
+    \subsection{M-estimation}
+        Let $X_{i \in \range{n}}$ be i.i.d.\ with some unknown distribution $\Pr$ and associated parameter $\mu^\ast$ on a sample space $E$.
+        An \emph{M-estimator} $\hat{\mu}$ of $\mu^\ast$ is the minimizer of an estimator of a function $\mathcal{Q}(\mu)$ such that:
+        \begin{itemize}
+            \item $\mathcal{Q}(\mu) = \E{[\rho(X, \mu)]}$ for some function $\rho: E \times \mathcal{M} \rightarrow \R$, where $\mathcal{M}$ is the set of all possible values for $\mu^\ast$.
+            \item $\mathcal{Q}(\mu)$ attains a unique minimum at $\mu^\ast$.
+        \end{itemize}
+        The goal is to find a loss function $\rho$ that satisfies these properties.
+        MLE is a special case of M-estimation where $\rho$ is negative (log-)likelihood.
+
+\section{Linear regression}
+    Solve $\min_\beta{\norm{y - X\beta}_2^2}$ to get $\hat{\beta} = \left(X^\top X\right)^{-1} X^\top y$.
+    If $X$ is not full rank, regularize the objective by adding $\lambda \norm{\beta}_p^2$ with hyperparameter $\lambda > 0$.
+    \begin{itemize}
+        \item If $p = 2$, this is $\ell_2$ regularization that penalizes large values of $\beta_j$.
+        \item If $p = 1$, this is $\ell_1$ (lasso) regularization that prefers sparse $\beta$.
+    \end{itemize}
+    
+\section{Generalized linear models}
+    Relax the assumptions of linear regression: Assume that $Y \,|\, X = x$ is distributed according to some $\Pr$ and that $g(\mu(x)) = x^\top \beta$, where $g$ is the \emph{link function} and $\mu(x) = \E{[Y \,|\, X = x]}$ is the regression function.
+
+    \emph{$k$-parameter exponential family:} A family of distributions $\set[\Pr_\theta]{\theta \in \Theta \subset \R^k}$ such that there exist real-valued functions $\eta_1, \eta_2, \dots, \eta_k$ and $B$ of $\theta$ and $T_1, T_2, \dots, T_k$ and $h$ of $y \in \R^q$ such that the density of $\Pr_\theta$ can be written
+    \[
+        f_\theta(y) = \exp{\left[\sum_{i=1}^{k} \eta_i(\theta) T_i(y) - B(\theta)\right]} h(y)
+    \]
+
+    The \emph{canonical exponential family} ($k = 1$, $y \in \R$) for some known functions $b$ and $c$ is
+    \[
+        f_\theta(y) = \exp{\left[\frac{y \theta - b(\theta)}{\phi} + c(y, \phi)\right]}
+    \]
+
+    If the \emph{dispersion parameter} $\phi$ is known, then this is a one-parameter exponential family with $\theta$ the canonical parameter.
+    It can be derived from log-likelihood that $\E{[Y]} = b'(\theta)$ and $\Var{Y} = b''(\theta) \phi$.
+
+    If $g$ is monotone increasing and differentiable, then $\mu = g^{-1}\left(X^\top \beta\right)$.
+    The \emph{canonical link} is $g(\mu) = \theta = (b')^{-1}(\mu)$ for the canonical parameter $\theta$.    
+\end{document}

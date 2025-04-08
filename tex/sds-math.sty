@@ -1,0 +1,74 @@
+\ProvidesPackage{sds-math}[Math definitions for MIT SDS capstone cheatsheets]
+\NeedsTeXFormat{LaTeX2e}
+
+\RequirePackage{mathtools}
+\RequirePackage{amssymb}
+\RequirePackage{diffcoeff}
+\RequirePackage{bm}
+
+\makeatletter
+
+% Sets.
+\DeclarePairedDelimiter\setc{\{}{\}}
+\let\oldset\setc
+\def\setc{\@ifstar{\oldset}{\oldset*}}
+\newcommand{\set}[2][\@empty]{%
+    \ifx\@empty#1
+        \setc{#2}
+    \else
+        \setc{#1 \,\middle|\, #2}
+    \fi
+}
+\newcommand*{\R}{\mathbb{R}}
+\newcommand*{\Z}{\mathbb{Z}}
+\newcommand*{\N}{\mathbb{N}}
+\newcommand*{\range}[1]{\left[#1\right]}
+
+% Absolute value and norm.
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+
+% Probability operators.
+\DeclareMathOperator{\prob}{\mathbb{P}}
+\renewcommand{\Pr}{\prob}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\ind}{\mathbb{1}}
+
+% Statistics notation.
+\newcommand*{\mean}[1]{\overline{#1}}
+\newcommand*{\iid}{\overset{\mathrm{i.i.d.}}{\sim}}
+\DeclareMathOperator{\bias}{bias}
+\newcommand*{\CI}{\mathcal{I}}
+\newcommand*{\FI}{\mathcal{I}}
+
+% Common distributions.
+\newcommand*{\unifdist}[2]{\mathrm{Unif}\left(\left[#1, #2\right]\right)}
+\newcommand*{\berdist}[1]{\mathrm{Ber}\left(#1\right)}
+\newcommand*{\bindist}[2]{\mathrm{Bin}\left(#1, #2\right)}
+\newcommand*{\geomdist}[1]{\mathrm{Geom}\left(#1\right)}
+\newcommand*{\poissdist}[1]{\mathrm{Poiss}\left(#1\right)}
+\newcommand*{\ndist}[2]{\mathcal{N}\left(#1, #2\right)}
+\newcommand*{\expdist}[1]{\mathrm{Exp}\left(#1\right)}
+\newcommand*{\betadist}[2]{\mathrm{Beta}\left(#1, #2\right)}
+\newcommand*{\gammadist}[2]{\mathrm{Gamma}\left(#1, #2\right)}
+
+% Convergence of random variables.
+\newcommand{\convp}{\overset{\Pr}{\longrightarrow}}
+\newcommand{\convd}{\overset{\mathrm{d}}{\longrightarrow}}
+\newcommand{\convas}{\overset{\mathrm{a.s.}}{\longrightarrow}}
+
+% Other mathematical notation.
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator{\grad}{\nabla}
+\DeclareMathOperator{\hess}{\bm{H}}
+\DeclareMathOperator{\KL}{KL}
+
+\makeatother
