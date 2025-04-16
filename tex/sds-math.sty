@@ -4,7 +4,6 @@
 \RequirePackage{mathtools}
 \RequirePackage{amssymb}
 \RequirePackage{diffcoeff}
-\RequirePackage{bm}
 
 \makeatletter
 
@@ -67,8 +66,13 @@
 % Other mathematical notation.
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
-\DeclareMathOperator{\grad}{\nabla}
-\DeclareMathOperator{\hess}{\bm{H}}
+\DeclareMathOperator{\trace}{tr}
+\newcommand*{\grad}{\nabla}
+\newcommand*{\hess}{H}
+\newcommand*{\jacobian}{J}
 \DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\Loss}{Loss}
+\DeclareMathOperator{\Cost}{Cost}
+\newcommand*{\bigO}[1]{\mathcal{O}\left(#1\right)}
 
 \makeatother

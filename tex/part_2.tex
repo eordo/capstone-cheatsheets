@@ -1,0 +1,296 @@
+\documentclass[a4paper]{article}
+
+\usepackage{sds-math}
+\usepackage{newcomputermodern}
+\usepackage{hyperref}
+\usepackage[landscape,twocolumn,margin=1.5cm]{geometry}
+\usepackage{parskip}
+\usepackage{array}
+\usepackage{enumitem}
+\setenumerate{noitemsep}
+\setitemize{noitemsep}
+\pagenumbering{gobble}
+
+\title{Part II Exam Cheatsheets:\\Statistics and Machine Learning}
+\author{Eric Ordo\~nez}
+\date{April 2025}
+
+\begin{document}
+\maketitle
+
+\section{Multivariate statistics}
+    \textbf{Calculus:} For a function $f: \R^d \rightarrow \R$, the \emph{gradient} of $f$ is
+    \[
+        \grad{f} = \left(\diffp{f}{x_1}, \diffp{f}{x_2}, \dots, \diffp{f}{x_d}\right)
+    \]
+    
+    The \emph{Hessian} of $f$ is the $d \times d$ matrix
+    \[
+        (\hess_f)_{ij} = \diffp{f}{x_i,x_j}, \quad 1 \leq i, j \leq d
+    \]
+    $f$ is convex (concave) if $\hess_f$ is positive (negative) semi-definite.
+    Strict convexity/concavity follows from strict definiteness.
+
+    Let $f: \R^d \rightarrow \R^k$.
+    The gradient of $f$ is the $d \times k$ matrix
+    \[
+        (\grad{f})_{ij} = \diffp{f_j}{x_i}
+    \]
+    whose transpose is called the \emph{Jacobian} $\jacobian_f$.
+
+    \textbf{Convergence:} A sequence of multivariate r.v.s $(X_n)$ in $\R^d$ converges in probability to $X$ if $X_n^{(k)} \convp X^{(k)}$ for all $k \in \range{d}$.
+
+    \textbf{Covariance:} Given a random variable $X = \left(X^{(1)}, X^{(2)}, \dots, X^{(d)}\right)$, the covariance matrix of $X$ is defined $(\Sigma_X)_{ij} = \Cov{\left(X^{(i)}, X^{(j)}\right)}$.
+
+    Let $\mu = \E{[X]}$ be the entry-wise mean of $X$.
+    The covariance matrix is equivalently defined $\Sigma_X = \E{[(X - \mu)(X - \mu)^\top]}$.
+
+    Properties of multivariate covariance: $\Sigma_{AX + B} = \Sigma_{AX} = A \Sigma_X A^\top$
+
+    \textbf{Gaussian distribution:} The $d$-dimensional Gaussian distribution of $X$ is completely specified by its mean $\E{[X]} = \left(\E{[X^{(1)}]}, \dots, \E{[X^{(d)}]}\right)$ and covariance matrix $\Sigma$.
+    If $\Sigma$ is invertible, then
+    \[
+        f(x) = \frac{1}{\sqrt{(2\pi)^d \det{(\Sigma)}}} \exp{\left(-\frac{1}{2} (x - \mu)^\top \Sigma^{-1} (x - \mu)\right)}
+    \]
+
+    \textbf{Central limit theorem:} A sequence $(T_n)$ of r.v.s in $\R^d$ converges in distribution to a random vector $T \in \R^d$ if $v^\top T_n \convd v^\top T$ for all $v \in \R^d$.
+
+    \textbf{Delta method:} Let $(T_n)$ be a sequence of random vectors such that $\sqrt{n} (T_n - \theta) \convd T$.
+    If $g: \R^d \rightarrow \R^k$ is continuously differentiable at $\theta$, then
+    \[
+        \sqrt{n} \left(g(T_n) - g(\theta)\right) \convd \grad{g}(\theta)^\top T = \jacobian_g T
+    \]
+
+\section{Linear regression}
+    \subsection{Assumptions}
+        Suppose that $\set{(X_i, Y_i)}_{i \in \range{n}}$ are sampled i.i.d.\ from an unknown joint distribution on $X$ and $Y$.
+        The \emph{regression function} of $Y$ with respect to $X$ is $\mu(x) = \E{[Y \,|\, X = x]}$.
+        Linear regression assumes that $\mu$ is linear in $x$.
+
+        From here on, assume that $Y \in \R$.
+        In the univariate case $X \in \R$, the \emph{theoretical linear regression} of $Y$ on $X$ is the line $Y = a^\ast + b^\ast X$, where
+        \[
+            b^\ast = \frac{\Cov{(X, Y)}}{\Var{X}}, \quad a^\ast = -b^\ast \E{[X]}
+        \]
+        minimize the square loss $\sum_{i=1}^{n} \abs{Y_i - aX_i - b}^2$.
+        
+        Assume $\Var{X} \neq 0$; otherwise, there is no line that predicts $Y$ given $X$ with probability 1, regardless of their distribution.
+        
+        \textbf{Ordinary least squares estimator:} Generalizing the setup to $\mu(X) = X\beta^\ast$, we have $\hat{\beta} = \argmin_\beta{\norm{Y - X\beta}^2}$.
+        
+        \textbf{Noise:} A r.v.\ $\epsilon$ that satisfies $Y = a^\ast + b^\ast X + \epsilon$ with $\E{[\epsilon]} = 0$ and $\Cov{(X, \epsilon)} = 0$.
+        In the multivariate case, $\epsilon \sim \ndist{0}{\sigma^2 I_n}$ for some known or unknown value of $\sigma^2 > 0$.
+
+    \subsection{Properties of the OLS estimator}
+        \begin{itemize}
+            \item Under the above assumptions, $\hat{\beta}$ is also the MLE.
+            \item Distribution: $\hat{\beta} \sim \ndist{\beta^\ast}{\sigma^2 (X^\top X)^{-1}}$
+            \item Quadratic risk: $\E{\left[\norm*{\hat{\beta} - \beta^\ast}_2^2\right]} = \sigma^2 \trace{\left((X^\top X\right)^{-1})}$
+            \item Prediction error: $\E{\left[\norm*{Y - X\hat{\beta}}_2^2\right]} = \sigma^2 (n - p)$
+            \item An unbiased estimator of $\sigma^2$ is $\hat{\sigma}^2 = \norm*{Y - X\hat{\beta}}_2^2 / (n - p)$.
+            \item $(n - p) \frac{\hat{\sigma}^2}{\sigma^2} \sim \chi_{n - p}^2$
+        \end{itemize}
+        Note that we can always perform linear regression and obtain an OLS estimate, no matter the true underlying distribution!
+
+\section{Linear classifiers}
+    \subsection{Perceptron algorithm}
+        Data is \emph{linearly separable} if there exists a hyperplane that can perfectly classify the data.
+        The perceptron algorithm is guaranteed to work for linearly separable data, but it will never converge if the data is not separable.
+        {
+            \ttfamily
+            \begin{enumerate}[label={}]
+                \item initialize $\theta = 0$, $\theta_0 = 0$
+                \item for $i = 1, \dots, T$
+                \begin{enumerate}[label={}]
+                    \item if $y^{(i)} (\theta x^{(i)} + \theta_0) \leq 0$
+                    \begin{itemize}[label={}]
+                        \item $\theta = \theta + y^{(i)} x^{(i)}$
+                        \item $\theta_0 = \theta_0 + y^{(i)}$
+                    \end{itemize}
+                \end{enumerate}
+            \end{enumerate}
+        }
+        Run the algorithm $T$ times or as many times needed for convergence, i.e., the perceptron makes no more misclassifications.
+
+    \subsection{Maximum margin classifiers}
+        A decision boundary is a hyperplane $\theta x + \theta_0 = 0$ with margin equal to $1/\norm{\theta}$.
+        Define \emph{agreement} by $z = y (\theta x + \theta_0)$.
+        \emph{Hinge loss} is defined
+        \[
+            \Loss_h{(z)} =
+            \begin{cases}
+                \hfil 0 &\mbox{if } z \geq 1 \\
+                1 - z &\mbox{if } z < 1
+            \end{cases}
+        \]
+        \emph{Regularization} seeks a balance between separation (overfitting) and margin maximization (generalizability) by minimizing
+        \[
+            J(\theta, \theta_0) = \frac{1}{n} \sum_{i=1}^{n} \Loss{\left(z^{(i)}; \theta, \theta_0\right)} + \frac{\lambda}{2} \norm{\theta}^2
+        \]
+        where $\lambda > 0$ is a hyperparameter.
+
+    \subsection{Kernels}
+        Let $\Phi: \R^d \rightarrow \R^p$ be a feature mapping where $p \gg d$.
+        A \emph{kernel function} is a function $K: \R^d \times \R^d \rightarrow \R$ such that $K(x, x') = \Phi(x) \cdot \Phi(x')$.
+
+        Composition rules:
+        \begin{itemize}
+            \item $K(x, x') = 1$ is a kernel.
+            \item Let $f: \R^d \rightarrow \R$ and $K$ be a kernel.
+            Then $f(x) K(x, x') f(x')$ is also a kernel.
+            \item If $K_1, K_2$ are kernels, then so are $K_1 + K_2$ and $K_1 K_2$.
+        \end{itemize}
+
+        \textbf{Kernel perceptron:} Data that is not linearly separable in one space might be in a higher-dimension feature space.
+        In the perceptron algorithm, recall that $\theta = \sum_{j=1}^{n} \alpha_j y^{(j)} \Phi(x^{(j)})$, where $\alpha_j$ is the number of times the perceptron has misclassified $y^{(j)}$.
+        Alter these two things for the kernel perceptron algorithm:
+        \begin{itemize}
+            \item The condition to check is $y^{(i)} \sum_{j=1}^{n} \alpha_j y^{{(j)}} K(x^j, x^i) \leq 0$.
+            \item The update rule is $\alpha_j = \alpha_j + 1$.
+        \end{itemize}
+
+\section{Gradient descent}
+    \subsection{Newton's method of minimization}
+        Let $f$ be a convex analytical function and $w_0$ the initial guess for its minimizer.
+        Newton's method updates our guess according to the law
+        \[
+            w_{t+1} = w_t - \left(\hess_f(w_t)\right)^{-1} \grad{f(w_t)}.
+        \]
+        This will not work for all convex loss functions because a positive semi-definite Hessian is not necessarily invertible!
+    
+    \subsection{Quadratic minimization}
+        Fix a step size $\alpha > 0$ and approximate the Hessian by $\hess_f(w_t) \approx \alpha^{-1} I$.
+        Applying the same logic from Newton's method, gradient descent updates $w_t$ according to the law
+        \[
+            w_{t+1} = w_t - \alpha \grad{f(w_t)}.
+        \]
+        Step size is a hyperparameter, and choosing the right step size to achieve convergence is an important part of calibrating a model.
+
+    \subsection{Stochastic gradient descent}
+        Take the loss of $w_t$ averaged over $N$ uniformly chosen data points:
+        \[
+            f(w_t) \approx \frac{1}{N} \sum_{i=1}^{N} f_i(w_t).
+        \]
+        Use this to estimate the gradient and update $w_t$ like in regular gradient descent:
+        \[
+            w_{t+1} = w_t - \frac{\alpha}{N} \sum_{i=1}^{N} \grad{f_i(w_t)}.
+        \]
+
+\section{Unsupervised learning}
+    \subsection{Clustering}
+        \emph{Clustering} attempts to partition a set $\set{x^{(i)}}_{i \in \range{n}}$ of feature vectors in $\R^d$ into $K$ distinct clusters.
+        It outputs a $K$-partition of the $n$ indices and a representative of each set in the partition.
+
+        Define a measure of homogeneity within cluster assignments and compare the measure across clustering scenarios.
+        We want to minimize the total cost of a scenario, $\Cost{(C_1, \dots, C_K)} = \sum_{j=1}^{K} \Cost{(C_j)}$, with some ways here to define cost:
+        \begin{itemize}
+            \item Greatest distance between any two points in a cluster, i.e., diameter.
+            \item Average distance between points inside a cluster.
+            \item Sum of the distances between the representative and all other points in a cluster.
+        \end{itemize}
+        
+        \textbf{$K$-means algorithm:} Given the number $K$ of clusters to label:
+        {
+            \ttfamily
+            \begin{enumerate}[label={}]
+                \item randomly select $z_1, \dots, z_K$
+                \item iterate
+                \begin{enumerate}[label={}]
+                    \item assign each $x^{(i)}$ to the closest $z_j$ such that
+                    \[
+                        \Cost{(z_1, \dots, z_K)} = \sum_{i=1}^{n} \min_{j \in \range{K}}{\norm{x^{(i)} - z_j}^2}.
+                    \]
+                    \item given $C_1, \dots, C_K$, find the best representatives $z_1, \dots, z_K$
+                    \[
+                        z_j = \argmin_{z}{\sum_{i \in C_j} \norm{x^{(i)} - z}^2}.
+                    \]
+                \end{enumerate}
+            \end{enumerate}
+        }
+        $z_j$ is the centroid of the $j$-th cluster (this means $z_j$ need not be one of the points!).
+        Each update of $z_j$ depends only upon points in $C_j$, thus the algorithm's output is sensitive to its random initialization.
+        Complexity: $\bigO{ndK}$.
+
+        \textbf{$K$-medioids algorithm:} Proceed the same way as in the $K$-means algorithm, but ensure $\set{z_1, \dots, z_K} \subseteq \set{x^{(1)}, \dots, x^{(n)}}$.
+        Complexity: $\bigO{n^2 dK}$.
+
+    \subsection{Mixture models}
+        A \emph{Gaussian mixture model (GMM)} is defined by the following parameters, collectively called $\theta$:
+        \begin{itemize}
+            \item $K$ mixture components;
+            \item A $d$-dimensional Gaussian $\ndist{\mu^{(j)}}{\sigma_j^2}$ for every $j \in \range{K}$;
+            \item Mixture weights $p_1, \dots, p_K$.
+        \end{itemize}
+        The likelihood of a point $x$ in a GMM is
+        \[
+            p(x \,|\, \theta) = \sum_{j=1}^{K} p_j \ndist{\mu^{(j)}}{\sigma_j^2}(x)
+        \]
+
+        \textbf{Expectation maximization algorithm:} The EM algorithm finds a locally optimum solution $\hat{\theta}$ to the GMM likelihood maximization problem.
+        \begin{itemize}
+            \item \textbf{E step:} Find the posterior probability that point $x^{(i)}$ was generated by cluster $j$, for each $i \in \range{n}$ and $j \in \range{K}$:
+            \[
+                p(j \,|\, i) = \frac{p_j \ndist{\mu^{(j)}}{\sigma_j^2 I}(x^{(i)})}{p(x^{(i)} \,|\, \theta)}
+            \]
+            \item \textbf{M step:} Maximize a proxy function $\hat{\ell}$ of the log-likelihood over $\theta$:
+            \[
+                \hat{\ell}\left(x^{(1)}, \dots, x^{(n)} \,|\, \theta\right) = \sum_{i=1}^{n} \sum_{j=1}^{K} p(j \,|\, i) \log{\left(\frac{p(x^{(i)}, x^{(i)} \text{ generated by cluster } j \,|\, \theta) }{p(j \,|\, i)}\right)}
+            \]
+        \end{itemize}
+        
+        Solve the first-order conditions of the M step for $\hat{\theta}$:
+        \begin{align*}
+            \widehat{\mu^{(j)}} &= \frac{\sum_{i=1}^{n} p(j \,|\, i) x^{(i)}}{\sum_{i=1}^{n} p(j \,|\, i)} \\
+            \widehat{p_j} &= \frac{1}{n} \sum_{i=1}^{n} p(j \,|\, i) \\
+            \widehat{\sigma_j^2} &= \frac{\sum_{i=1}^{n} p(j \,|\, i) \norm*{x^{(i)} - \widehat{\mu^{(j)}}}^2}{d \sum_{i=1}^{n} p(j \,|\, i)}
+        \end{align*}
+        
+        Repeat until there is no change in the likelihood.
+
+\section{Reinforcement learning}
+    \subsection{Markov decision processes}
+        A \emph{Markov decision process} is a collection $\left\langle S, A, T, R \right\rangle$, where:
+        \begin{itemize}
+            \item $S$ and $A$ are the state and action spaces, respectively;
+            \item $T(s, a, s')$ is the transition probability of ending in state $s'$ by taking action $a$ from state $s$;
+            \item $R(s, a, s')$ is the state-specific reward for taking action $a$.
+        \end{itemize}
+        All transition probabilities are memoryless: $\Pr{(s_{t+1} \,|\, s_t, s_{t-1}, \dots, s_0)} = \Pr{(s_{t+1} \,|\, s_t)}$.
+
+        Optimal behavior maximizes the expectation of a \emph{utility function} $U$ that measures accumulated rewards.
+        Suppose rewards depend only upon the current state.
+        Then we maximize:
+        \begin{itemize}
+            \item \emph{Finite horizon:} The sum of rewards after acting for a fixed number of steps $n$: $U(s_0, s_1, \dots, s_n) = \sum_{k=0}^{n} R(s_k)$.
+            \item \emph{Infinite horizon:} The infinite sum of rewards that are exponentially discounted by a factor $\gamma$: $U(s_0, s_1, \dots, s_n) = \sum_{k=0}^{\infty} \gamma^k R(s_k)$.
+        \end{itemize}
+    
+    \subsection{Policy and value functions}
+        \textbf{Policy:} A function $\pi: S \rightarrow A$ that assigns an action $\pi(s)$ for any state $s$.
+
+        \textbf{Optimal policy:} A policy $\pi^\ast$ that maximizes expected utility.
+
+        \textbf{Value function:} The expected reward $V^\ast(s)$ from acting optimally at state $s$.
+
+        \textbf{Q-function:} The expected reward $Q^\ast(s, a)$ from starting at state $s$, taking action $a$, then acting optimally afterwards.
+        \[
+            Q^\ast(s, a) = \sum_{s'} T(s, a, s') \left[R(s, a, s') + \gamma V^\ast(s')\right]
+        \]
+
+        \textbf{Bellman equation:} $V^\ast(s) = \max_a{Q^\ast(s, a)}$
+
+    \subsection{Iteration}
+        \textbf{Value function iteration:} Updated value of state $s$ after acting optimally for $k$ steps is:
+        \[
+            V_{k+1}^\ast(s) = \max_a{\left\{\sum_{s'} T(s, a, s') \left(R(s, a, s') + \gamma V_k^\ast(s')\right)\right\}}
+        \]
+        Complexity: $\bigO{\abs{S}^2 \abs{A}}$
+        
+        \textbf{Q-value iteration:} Updated Q-value of the state-action pair $(s, a)$ for the $k$-th step is:
+        \[
+            Q_{k+1}^\ast(s, a) = \sum_{s'} T(s, a, s') \left(R(s, a, s') + \gamma \max_{a'}{Q_k^\ast(s', a')}\right)
+        \]
+
+        An \emph{$\epsilon$-greedy} algorithm is a training algorithm that randomly samples a new action with probability $\epsilon$ or chooses the best currently available option with probability $1 - \epsilon$.
+        $\epsilon$ should eventually decay during training.
+\end{document}
