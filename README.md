@@ -2,6 +2,7 @@
 
 These are my cheatsheets for the capstone exams in the [MIT MicroMaster in Statistics and Data Science](https://micromasters.mit.edu/ds/).
 Note that they are _not_ exhaustive; these are what I thought would be most helpful to me on an exam.
+(The Part 2 cheatsheet does not cover neural networks just because I ran out of time).
 Feel free to use them for your own studies or as a template for your own cheatsheets.
 
 ## Part 1: Probability and Statistics Theory
@@ -21,9 +22,17 @@ This cheatsheet contains materials from the following courses:
 
 ## Compilation
 
-The documents are meant to be built by latexmk using LuaTeX.
+The documents are meant to be built by latexmk and LuaTeX.
 All the class and package requirements should come in a usual TeX Live installation.
-You could compile them yourself or use the provided Makefile:
+You could compile them yourself:
+
+```bash
+cd tex
+lualatex -synctex=1 -interaction=nonstopmode -file-line-error -pdf part_1.tex
+lualatex -synctex=1 -interaction=nonstopmode -file-line-error -pdf part_2.tex
+```
+
+Or use the provided Makefile:
 
 ```bash
 make part_1.pdf
